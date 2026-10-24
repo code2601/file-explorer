@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Atlas — 파일 시스템 탐색기</title>
+<style>
+:root{--bg:#f5f7fb;--panel:#fff;--ink:#182238;--muted:#7b8498;--line:#e7ebf3;--blue:#5567ef;--blue-soft:#edf0ff;--nav:#111a31;--shadow:0 8px 28px rgba(25,38,75,.055);--green:#169b70}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,"Pretendard","Noto Sans KR",system-ui,-apple-system,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #7b89ff70;outline-offset:2px}
+.app{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:100vh}.sidebar{background:var(--nav);color:#dce3f7;padding:25px 15px;display:flex;flex-direction:column;gap:29px}.brand{display:flex;align-items:center;gap:11px;padding:0 10px}.logo{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#8290ff,#4d5de9);color:white;font-size:21px;box-shadow:0 7px 17px #4657d955}.brand b{font-size:19px;letter-spacing:-.6px}.brand small{display:block;color:#8895b5;font-size:10px;letter-spacing:1.5px}.nav-label{font-size:10px;font-weight:800;color:#7885a4;letter-spacing:1.7px;padding:0 12px 8px}.nav{display:grid;gap:5px}.nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border:0;border-radius:10px;background:transparent;color:#b0bad4;transition:.18s}.nav button:hover,.nav button.active{background:#263252;color:#fff}.nav button.active{box-shadow:inset 3px 0 #8792ff}.nav .ico{width:21px;text-align:center;font-size:17px}.side-note{margin-top:auto;padding:14px;border:1px solid #2b3654;border-radius:13px;color:#a8b4d1;font-size:12px}.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:#27d39b;margin-right:7px}.side-note p{margin:8px 0 0 14px;line-height:1.6}
+main{padding:28px clamp(16px,3vw,42px) 46px;min-width:0}.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:1.8px;color:var(--blue)}h1{font-size:28px;letter-spacing:-1.1px;line-height:1.2;margin:5px 0 0}.status{background:#e8f8f1;color:#13885f;border-radius:30px;padding:8px 12px;font-size:12px;font-weight:700;white-space:nowrap}.status.wait{background:#edf0f7;color:#657087}.choose-card{background:linear-gradient(120deg,#fff,#f8f9ff);border:1px solid var(--line);border-radius:16px;padding:19px 20px;margin-bottom:21px;display:flex;align-items:center;gap:18px;justify-content:space-between;box-shadow:var(--shadow)}.choose-copy{min-width:0}.choose-copy h2{font-size:15px;margin:0 0 4px}.choose-copy p{font-size:12px;color:var(--muted);margin:0}.choose-actions{display:flex;gap:9px;flex-shrink:0;align-items:center}.primary{background:var(--blue);color:#fff;border:0;border-radius:10px;padding:11px 16px;font-weight:750;box-shadow:0 5px 12px #5267f225}.primary:hover{background:#4254df}.secondary{background:#eef1f8;color:#4c5870;border:0;border-radius:9px;padding:10px 13px;font-weight:700}.fileinput{display:none}.selection{color:#5b6580;font-size:11px;margin-top:7px;overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:20px}.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);min-width:0}.stat{padding:17px 18px}.stat-head{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px}.stat-icon{width:33px;height:33px;border-radius:10px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue);font-size:16px}.stat strong{display:block;font-size:25px;letter-spacing:-.8px;margin:9px 0 2px;overflow-wrap:anywhere}.stat small{color:var(--muted);font-size:11px}
+.workspace{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px}.panel{padding:19px}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:16px}.panel h2{font-size:16px;letter-spacing:-.35px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:4px}.pill{font-size:10px;font-weight:800;color:var(--blue);background:var(--blue-soft);border-radius:7px;padding:5px 8px;white-space:nowrap}.searchline{display:flex;gap:8px;margin-bottom:10px}.searchline input{width:100%;min-width:0;background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px;outline:none}.searchline input:focus{border-color:#8794ff;box-shadow:0 0 0 3px #5267f215}.searchline button{background:#19243d;color:#fff;border:0;border-radius:9px;padding:0 15px;font-weight:700}.checks{display:flex;gap:13px;align-items:center;color:var(--muted);font-size:12px;margin-bottom:14px}.checks input{accent-color:var(--blue)}.results{display:grid;gap:8px;max-height:390px;overflow:auto}.result{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;align-items:flex-start;gap:10px}.file-icon{width:33px;height:33px;flex:none;display:grid;place-items:center;border-radius:9px;background:#f0f3ff;font-size:16px}.result-main{min-width:0;flex:1}.result-name{font-weight:750;overflow-wrap:anywhere}.result-path{font-size:11px;color:var(--muted);overflow-wrap:anywhere;margin-top:3px}.result-meta{font-size:11px;color:var(--blue);white-space:nowrap;padding-top:3px}.empty{border:1px dashed #dfe4ef;border-radius:10px;padding:24px 12px;text-align:center;color:var(--muted);font-size:12px}.tree-tools{display:flex;gap:6px;flex-shrink:0}.ghost{background:#f1f3f9;color:#505c75;border:0;border-radius:8px;padding:7px 9px;font-size:11px;font-weight:700}.tree{font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;max-height:510px;overflow:auto;padding:2px 0}.tree-row{display:flex;align-items:center;gap:6px;min-width:max-content;padding:5px 6px;border-radius:6px}.tree-row:hover{background:#f5f6ff}.twisty{width:14px;color:#8992a7;cursor:pointer;text-align:center;flex:none;user-select:none}.tree-name{color:#29344d;overflow-wrap:anywhere}.tree-size{margin-left:auto;color:#8b94a8;padding-left:20px}.lower{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.wide{grid-column:1/-1}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:12px}.table th{text-align:left;color:var(--muted);font-weight:650;padding:9px 6px;border-bottom:1px solid var(--line);white-space:nowrap}.table td{padding:10px 6px;border-bottom:1px solid #f0f2f7;vertical-align:top}.table tr:last-child td{border-bottom:0}.table td:first-child{overflow-wrap:anywhere}.rank{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:7px;background:#f0f2ff;color:#5969e9;font-weight:800;margin-right:7px}.bar{height:5px;background:#edf0f7;border-radius:10px;margin-top:6px;overflow:hidden;min-width:45px}.bar span{display:block;height:100%;background:linear-gradient(90deg,#7181ff,#4e61ef);border-radius:10px}.pathcell{font-size:10px;color:var(--muted);margin-top:3px;overflow-wrap:anywhere}.note{font-size:11px;color:var(--muted);margin:16px 2px 0;line-height:1.7}.toast{position:fixed;right:20px;bottom:20px;background:#17213a;color:white;padding:12px 16px;border-radius:11px;box-shadow:var(--shadow);z-index:20;max-width:min(500px,calc(100vw - 40px));white-space:pre-wrap}.hidden{display:none!important}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.workspace{grid-template-columns:1fr}.lower{grid-template-columns:1fr}.wide{grid-column:auto}}
+@media(max-width:680px){.app{grid-template-columns:1fr}.sidebar{padding:13px;gap:13px}.brand{padding:0 5px}.nav-label,.side-note{display:none}.nav{grid-template-columns:repeat(5,minmax(0,1fr));gap:3px}.nav button{flex-direction:column;justify-content:center;gap:3px;padding:8px 2px;font-size:10px;text-align:center}.nav .ico{width:auto}.topbar h1{font-size:23px}.status{font-size:10px}.choose-card{align-items:flex-start;flex-direction:column}.choose-actions{width:100%}.choose-actions button{flex:1}.stat{padding:12px}.stat strong{font-size:21px}main{padding:18px 12px 35px}.panel{padding:14px}.tree-tools{flex-wrap:wrap;justify-content:flex-end}.panel-head{gap:7px}.panel h2{font-size:15px}.table{font-size:11px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><div class="logo">⌘</div><div><b>atlas</b><small>FILE INTELLIGENCE</small></div></div>
+ <div><div class="nav-label">WORKSPACE</div><nav class="nav">
+  <button class="active" data-target="overview"><span class="ico">▦</span>대시보드</button>
+  <button data-target="locatePanel"><span class="ico">⌕</span>파일 찾기</button>
+  <button data-target="filesPanel"><span class="ico">↗</span>큰 파일</button>
+  <button data-target="foldersPanel"><span class="ico">▱</span>큰 폴더</button>
+  <button data-target="extensionsPanel"><span class="ico">◉</span>확장자 통계</button>
+ </nav></div>
+ <div class="side-note"><span class="pulse"></span><b>브라우저 로컬 분석</b><p>선택한 폴더의 파일은 이 브라우저 안에서만 분석됩니다.</p></div>
+</aside>
+<main id="overview">
+ <header class="topbar"><div><div class="eyebrow">FILE SYSTEM ANALYTICS</div><h1>파일 탐색기</h1></div><div class="status wait" id="status"><span class="pulse"></span><span id="statusText">폴더 선택 필요</span></div></header>
+ <section class="choose-card">
+  <div class="choose-copy"><h2>분석할 폴더 선택</h2><p>폴더 내부의 파일과 하위 폴더를 읽어 용량 및 구조를 분석합니다.</p><div id="selectedPath" class="selection">아직 선택된 폴더가 없습니다.</div></div>
+  <div class="choose-actions"><input id="directoryInput" class="fileinput" type="file" webkitdirectory directory multiple><button id="chooseBtn" class="primary">📂 폴더 선택하기</button><button id="clearBtn" class="secondary">초기화</button></div>
+ </section>
+ <section class="stats">
+  <div class="stat"><div class="stat-head">전체 파일 <span class="stat-icon">▤</span></div><strong id="fileCount">—</strong><small>스캔된 파일 수</small></div>
+  <div class="stat"><div class="stat-head">폴더 수 <span class="stat-icon">▱</span></div><strong id="folderCount">—</strong><small>루트 포함 하위 폴더</small></div>
+  <div class="stat"><div class="stat-head">전체 용량 <span class="stat-icon">◫</span></div><strong id="totalSize">—</strong><small>파일 크기 합계</small></div>
+  <div class="stat"><div class="stat-head">확장자 종류 <span class="stat-icon">◉</span></div><strong id="extCount">—</strong><small>확장자 없는 파일 포함</small></div>
+ </section>
+ <section class="workspace">
+  <div class="panel" id="locatePanel"><div class="panel-head"><div><h2>파일 위치 찾기</h2><div class="sub">BFS · 루트에서 가까운 항목부터 검색</div></div><span class="pill">BREADTH-FIRST</span></div>
+   <div class="searchline"><input id="keyword" placeholder="파일명 또는 일부 입력 (예: report.pdf)"><button id="findBtn">찾기</button></div>
+   <div class="checks"><label><input id="includeDirs" type="checkbox"> 폴더도 검색</label><span id="resultSummary">폴더 분석 후 검색할 수 있어요.</span></div><div id="searchResults" class="results"><div class="empty">먼저 분석할 폴더를 선택하세요.</div></div>
+  </div>
+  <div class="panel" id="treePanel"><div class="panel-head"><div><h2>폴더 트리</h2><div class="sub">계층을 펼치고 접으며 탐색하세요</div></div><div class="tree-tools"><button id="expandAll" class="ghost">모두 펼치기</button><button id="collapseAll" class="ghost">접기</button></div></div><div id="tree" class="tree"><div class="empty">폴더 구조가 여기에 시각화됩니다.</div></div></div>
+ </section>
+ <section class="lower">
+  <div class="panel" id="filesPanel"><div class="panel-head"><div><h2>용량 큰 파일 TOP N</h2><div class="sub">공간을 많이 차지하는 파일</div></div><select id="fileN" class="ghost" aria-label="파일 표시 개수"><option>5</option><option selected>10</option><option>20</option><option>50</option></select></div><div id="topFiles"><div class="empty">폴더를 선택하면 결과가 나타납니다.</div></div></div>
+  <div class="panel" id="foldersPanel"><div class="panel-head"><div><h2>용량 큰 폴더 TOP N</h2><div class="sub">하위 파일 용량 합산 결과</div></div><select id="folderN" class="ghost" aria-label="폴더 표시 개수"><option>5</option><option selected>10</option><option>20</option><option>50</option></select></div><div id="topFolders"><div class="empty">폴더를 선택하면 결과가 나타납니다.</div></div></div>
+  <div class="panel wide" id="extensionsPanel"><div class="panel-head"><div><h2>확장자별 총 용량 통계</h2><div class="sub">파일 수와 총 사용 용량 비교</div></div><span class="pill">BY EXTENSION</span></div><div id="extStats"><div class="empty">폴더를 선택하면 결과가 나타납니다.</div></div></div>
+ </section>
+ <p class="note">개인정보 보호: 선택한 파일의 내용은 업로드하지 않으며 파일명·상대 경로·크기만 브라우저에서 사용합니다. 운영체제와 브라우저가 접근을 허용한 항목만 분석됩니다. 매우 큰 폴더는 브라우저 메모리 사용량이 늘어날 수 있습니다.</p>
+</main>
+</div><div id="toast" class="toast hidden" role="status"></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+let root=null, allNodes=[], allFiles=[], allFolders=[], extensions=[], treeOpen=new Set(), toastTimer=null;
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function formatSize(n){if(!Number.isFinite(n))return '—';const units=['B','KB','MB','GB','TB','PB'];let i=0;while(n>=1024&&i<units.length-1){n/=1024;i++}return (i===0?Math.round(n):n.toFixed(1))+' '+units[i]}
+function number(n){return n.toLocaleString('ko-KR')}
+function toast(message){$('toast').textContent=message;$('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),4200)}
+function fileIcon(name){const ext=(name.split('.').pop()||'').toLowerCase();return ({pdf:'📕',png:'🖼️',jpg:'🖼️',jpeg:'🖼️',gif:'🖼️',webp:'🖼️',mp4:'🎬',mov:'🎬',mp3:'🎵',wav:'🎵',zip:'🗜️',rar:'🗜️',py:'🐍',js:'📜',html:'🌐',css:'🎨',xlsx:'📊',csv:'📊',docx:'📝',txt:'📄',pptx:'📊'})[ext]||'📄'}
+function makeFolder(name,path,parent=null){return {name,path,is_dir:true,size:0,children:[],parent,error:false}}
+function extOf(name){const dot=name.lastIndexOf('.');return dot>0?name.slice(dot).toLowerCase():'(없음)'}
+function buildModel(fileList){
+ const files=Array.from(fileList);
+ if(!files.length) throw Error('선택한 폴더에서 파일을 찾을 수 없습니다. 빈 폴더만 있는 경우에는 브라우저가 내용을 전달하지 않을 수 있습니다.');
+ const rootName=(files[0].webkitRelativePath||files[0].name).split('/')[0]||'선택한 폴더';
+ const newRoot=makeFolder(rootName,rootName);
+ const foldersByPath=new Map([[rootName,newRoot]]), nodes=[newRoot], leafFiles=[];
+ for(const file of files){
+  const relative=file.webkitRelativePath||file.name;
+  const parts=relative.split('/').filter(Boolean);
+  if(parts.length===0) continue;
+  let parent=newRoot, currentPath=rootName;
+  for(let i=1;i<parts.length-1;i++){
+   currentPath+='/'+parts[i];
+   let folder=foldersByPath.get(currentPath);
+   if(!folder){folder=makeFolder(parts[i],currentPath,parent);foldersByPath.set(currentPath,folder);parent.children.push(folder);nodes.push(folder)}
+   parent=folder;
+  }
+  const fnode={name:parts[parts.length-1],path:relative,is_dir:false,size:file.size,children:[],parent,error:false,extension:extOf(parts[parts.length-1])};
+  parent.children.push(fnode);leafFiles.push(fnode);nodes.push(fnode);
+ }
+ // Stable alphabetical order across folders and files.
+ for(const node of foldersByPath.values()) node.children.sort((a,b)=>a.name.localeCompare(b.name,'ko',{numeric:true,sensitivity:'base'}));
+ // Folder totals are calculated bottom-up (post-order), preserving the source algorithm's semantics.
+ for(let i of Array.from(foldersByPath.values()).sort((a,b)=>pathDepth(b.path)-pathDepth(a.path))){
+  i.size=i.children.reduce((sum,c)=>sum+c.size,0);
+ }
+ return {root:newRoot,nodes,files:leafFiles,folders:Array.from(foldersByPath.values())};
+}
+function pathDepth(p){return p.split('/').length}
+function bfs(node){const q=[{node,depth:0}],result=[];for(let head=0;head<q.length;head++){const item=q[head];result.push(item);for(const c of item.node.children)q.push({node:c,depth:item.depth+1})}return result}
+function renderTreeNode(node,depth=0){const has=node.children.length>0,open=treeOpen.has(node.path);const icon=node.is_dir?'📁':fileIcon(node.name);let out=`<div class="tree-row" style="padding-left:${depth*15+4}px"><span class="twisty" role="button" tabindex="0" aria-label="${open?'접기':'펼치기'} ${esc(node.name)}" data-toggle="${esc(node.path)}">${has?(open?'▾':'▸'):'·'}</span><span>${icon}</span><span class="tree-name">${esc(node.name)}${node.error?' ⚠':''}</span><span class="tree-size">${formatSize(node.size)}</span></div>`;
+ if(has&&open)for(const child of node.children)out+=renderTreeNode(child,depth+1);return out}
+function renderTree(){if(!root){$('tree').innerHTML='<div class="empty">폴더 구조가 여기에 시각화됩니다.</div>';return}$('tree').innerHTML=renderTreeNode(root)}
+function makeTable(items,kind){if(!items.length)return '<div class="empty">표시할 항목이 없습니다.</div>';const max=Math.max(...items.map(x=>x.size),1);return `<div class="table-wrap"><table class="table"><thead><tr><th>이름 / 경로</th><th>용량</th></tr></thead><tbody>${items.map((x,i)=>`<tr><td><span class="rank">${i+1}</span><b>${esc(x.name)}</b><div class="pathcell">${esc(x.path)}</div><div class="bar"><span style="width:${Math.max(1,x.size/max*100)}%"></span></div></td><td style="white-space:nowrap;font-weight:750">${formatSize(x.size)}</td></tr>`).join('')}</tbody></table></div>`}
+function renderTop(){if(!root)return;$('topFiles').innerHTML=makeTable([...allFiles].sort((a,b)=>b.size-a.size).slice(0,+$('fileN').value),'file');$('topFolders').innerHTML=makeTable([...allFolders].filter(x=>x!==root).sort((a,b)=>b.size-a.size).slice(0,+$('folderN').value),'folder')}
+function renderExt(){if(!root)return;const rows=new Map();for(const f of allFiles){const ext=f.extension;const current=rows.get(ext)||{extension:ext,count:0,size:0};current.count++;current.size+=f.size;rows.set(ext,current)}extensions=Array.from(rows.values()).sort((a,b)=>b.size-a.size);if(!extensions.length){$('extStats').innerHTML='<div class="empty">확장자 통계가 없습니다.</div>';return}const max=Math.max(...extensions.map(x=>x.size),1);$('extStats').innerHTML=`<div class="table-wrap"><table class="table"><thead><tr><th>확장자</th><th>파일 수</th><th>총 용량</th><th style="width:25%">비중</th></tr></thead><tbody>${extensions.map(x=>`<tr><td><b>${esc(x.extension)}</b></td><td>${number(x.count)}</td><td>${formatSize(x.size)}</td><td><div class="bar"><span style="width:${x.size/max*100}%"></span></div></td></tr>`).join('')}</tbody></table></div>`}
+function renderStats(){ $('fileCount').textContent=number(allFiles.length);$('folderCount').textContent=number(allFolders.length);$('totalSize').textContent=formatSize(root.size);$('extCount').textContent=number(extensions.length)}
+function runSearch(){if(!root){toast('먼저 분석할 폴더를 선택하세요.');return}const q=$('keyword').value.trim().toLocaleLowerCase();if(!q){toast('검색할 파일명을 입력하세요.');return}const includeDirs=$('includeDirs').checked;const items=bfs(root).filter(({node})=>node!==root&&(!node.is_dir||includeDirs)&&node.name.toLocaleLowerCase().includes(q));$('resultSummary').textContent=`${number(items.length)}개 결과 · BFS 가까운 순`;
+ if(!items.length){$('searchResults').innerHTML='<div class="empty">일치하는 항목을 찾지 못했습니다.</div>';return}
+ $('searchResults').innerHTML=items.slice(0,500).map(({node,depth})=>`<div class="result"><div class="file-icon">${node.is_dir?'📁':fileIcon(node.name)}</div><div class="result-main"><div class="result-name">${esc(node.name)} ${node.name.toLocaleLowerCase()===q?'<span class="pill">정확히 일치</span>':''}</div><div class="result-path">${esc(node.path)}</div><div class="sub">깊이 ${depth} · ${node.is_dir?'폴더':'파일'}</div></div><div class="result-meta">${formatSize(node.size)}</div></div>`).join('')+(items.length>500?'<div class="sub">화면에는 처음 500개 결과만 표시했습니다.</div>':'');
+}
+function setLoading(on){$('chooseBtn').disabled=on;$('chooseBtn').textContent=on?'분석 중…':'📂 폴더 선택하기';$('status').classList.toggle('wait',on);$('statusText').textContent=on?'분석 중…':'폴더 선택 필요'}
+$('chooseBtn').addEventListener('click',()=>$('directoryInput').click());
+$('directoryInput').addEventListener('change',async e=>{const list=e.target.files;if(!list||!list.length)return;setLoading(true);try{await new Promise(resolve=>setTimeout(resolve,10));const model=buildModel(list);root=model.root;allNodes=model.nodes;allFiles=model.files;allFolders=model.folders;treeOpen=new Set([root.path]);extensions=[];renderTree();renderTop();renderExt();renderStats();$('selectedPath').textContent=`${root.name} · ${number(allFiles.length)}개 파일 분석 완료`;$('status').classList.remove('wait');$('statusText').textContent='분석 완료';$('resultSummary').textContent='검색어를 입력하세요.';$('searchResults').innerHTML='<div class="empty">파일명 또는 일부를 입력해 검색하세요.</div>';toast(`분석 완료: 파일 ${number(allFiles.length)}개, 폴더 ${number(allFolders.length)}개`)}catch(err){toast(err.message||'폴더 분석에 실패했습니다.')}finally{setLoading(false);$('status').classList.remove('wait');$('statusText').textContent=root?'분석 완료':'폴더 선택 필요';e.target.value=''}});
+$('clearBtn').addEventListener('click',()=>{root=null;allNodes=[];allFiles=[];allFolders=[];extensions=[];treeOpen.clear();$('fileCount').textContent='—';$('folderCount').textContent='—';$('totalSize').textContent='—';$('extCount').textContent='—';$('selectedPath').textContent='아직 선택된 폴더가 없습니다.';$('status').classList.add('wait');$('statusText').textContent='폴더 선택 필요';$('resultSummary').textContent='폴더 분석 후 검색할 수 있어요.';$('searchResults').innerHTML='<div class="empty">먼저 분석할 폴더를 선택하세요.</div>';$('tree').innerHTML='<div class="empty">폴더 구조가 여기에 시각화됩니다.</div>';$('topFiles').innerHTML=$('topFolders').innerHTML=$('extStats').innerHTML='<div class="empty">폴더를 선택하면 결과가 나타납니다.</div>';toast('분석 결과를 초기화했습니다.')});
+$('findBtn').addEventListener('click',runSearch);$('keyword').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch()});$('fileN').addEventListener('change',renderTop);$('folderN').addEventListener('change',renderTop);
+$('tree').addEventListener('click',e=>{const el=e.target.closest('[data-toggle]');if(!el||!root)return;const path=el.dataset.toggle;if(treeOpen.has(path))treeOpen.delete(path);else treeOpen.add(path);renderTree()});
+$('tree').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-toggle]')){e.preventDefault();e.target.click()}});
+$('expandAll').addEventListener('click',()=>{if(!root){toast('먼저 폴더를 선택하세요.');return}treeOpen=new Set(allFolders.map(n=>n.path));renderTree()});
+$('collapseAll').addEventListener('click',()=>{if(!root){toast('먼저 폴더를 선택하세요.');return}treeOpen=new Set([root.path]);renderTree()});
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');const target=b.dataset.target;if(target==='overview')window.scrollTo({top:0,behavior:'smooth'});else $(target).scrollIntoView({behavior:'smooth',block:'start'})}));
+</script>
+</body></html>
